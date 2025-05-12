@@ -3,7 +3,9 @@ const cors = require("cors");
 const db = require("./models")
 const dotenv = require("dotenv");
 const  FortuneRequest  = require("./routes/FortuneRequest");
-
+const authRoutes = require("./routes/auth")
+const authenticate = require("./middlewares/jwt")
+const reviewRoutes = require("./routes/review");
 
 dotenv.config();
 const app = express();
@@ -12,6 +14,10 @@ app.use(express.json());
 app.use("/uploads", express.static("uploads"))
 
 app.use("/api/fortune-requests", FortuneRequest)
+app.use("/api/auth", authRoutes);
+app.use("/api", reviewRoutes);
+
+
 
 const PORT = process.env.PORT || 5000;
 

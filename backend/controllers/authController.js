@@ -1,0 +1,145 @@
+const bcrypt = require("bcryptjs");
+const jwt = require("../middlewares/jwt");
+const { User } = require("../models");
+
+exports.signup = async (req, res) => {
+  const { name, email, password } = req.body;
+
+  try {
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role: "user", 
+    });
+
+    const token = jwt.generateToken(newUser);
+
+    res.status(201).json({
+      message: "Kullanıcı başarıyla kaydedildi.",
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Bir hata oluştu." });
+  }
+};
+
+exports.login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email } });
+
+    if (!user) {
+      return res.status(400).json({ error: "Kullanıcı bulunamadı" });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ error: "Yanlış şifre" });
+    }
+
+    const token = jwt.generateToken(user);
+
+    res.status(200).json({
+      message: "Giriş başarılı",
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Bir hata oluştu." });
+  }
+};
+
+
+
+exports.fortunetellerLogin = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const user = await User.findOne({ where: { email, role: "fortuneteller" } });
+
+    if (!user) {
+      return res.status(400).json({ error: "Falcı bulunamadı veya kaydedilemez." });
+    }
+
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    if (!isMatch) {
+      return res.status(400).json({ error: "Yanlış şifre" });
+    }
+
+    const token = jwt.generateToken(user);
+
+    res.status(200).json({
+      message: "Falcı olarak giriş başarılı",
+      token,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Bir hata oluştu." });
+  }
+};
+
+
+exports.getAllUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: { exclude: ["password"] }, 
+    });
+
+    res.status(200).json(users);
+  } catch (error) {
+    res.status(500).json({ error: "Kullanıcılar alınırken bir hata oluştu." });
+  }
+};
+
+exports.updateUser = async (req, res) => {
+  const { id } = req.params; // URL'den alınan kullanıcı ID
+  const { name, email, role } = req.body;
+
+  // Role doğrulaması yap (güvenlik için)
+  const validRoles = ["user", "fortuneteller"];
+  if (role && !validRoles.includes(role)) {
+    return res.status(400).json({ error: "Geçersiz rol" });
+  }
+
+  try {
+    const user = await User.findByPk(id); // veya findOne({ where: { email } })
+
+    if (!user) {
+      return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+    }
+
+    // Sadece gelen alanları güncelle
+    if (name) user.name = name;
+    if (email) user.email = email;
+    if (role) user.role = role;
+
+    await user.save();
+
+    res.status(200).json({ message: "Kullanıcı başarıyla güncellendi", user });
+  } catch (error) {
+    res.status(500).json({ error: "Bir hata oluştu" });
+  }
+};
+
+exports.topUpBalance = async (req, res) => {
+  const { id } = req.params;
+  const { amount } = req.body;
+
+  try {
+    const user = await User.findByPk(id);
+    if (!user) return res.status(404).json({ error: "Kullanıcı bulunamadı" });
+
+    user.balance += parseFloat(amount);
+    await user.save();
+
+    res.json({ message: "Bakiye yüklendi", balance: user.balance });
+  } catch (err) {
+    res.status(500).json({ error: "Bakiye güncellenemedi" });
+  }
+};
+
+
