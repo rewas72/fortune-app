@@ -8,6 +8,7 @@ router.post("/fortuneteller-login", authController.fortunetellerLogin);
 router.get("/users", authController.getAllUsers);
 router.put("/users/:id", authController.updateUser);
 router.put("/users/:id/topup", authController.topUpBalance);
+router.patch('/users/:id/price', authController.updateFortunePrice);
 
 
 module.exports = router;

@@ -21,6 +21,10 @@ module.exports = (sequelize, DataTypes) => {
       type: DataTypes.FLOAT,
       defaultValue: 0,
     },
+    fortunePrice: {
+      type: DataTypes.FLOAT,
+      defaultValue:0
+    }
   });
 
   return User;

@@ -12,7 +12,7 @@ exports.signup = async (req, res) => {
       name,
       email,
       password: hashedPassword,
-      role: "user", 
+      role: "user",
     });
 
     const token = jwt.generateToken(newUser);
@@ -25,7 +25,6 @@ exports.signup = async (req, res) => {
     res.status(500).json({ error: "Bir hata oluştu." });
   }
 };
-
 exports.login = async (req, res) => {
   const { email, password } = req.body;
 
@@ -86,7 +85,7 @@ exports.fortunetellerLogin = async (req, res) => {
 exports.getAllUsers = async (req, res) => {
   try {
     const users = await User.findAll({
-      attributes: { exclude: ["password"] }, 
+      attributes: { exclude: ["password"] },
     });
 
     res.status(200).json(users);
@@ -143,3 +142,33 @@ exports.topUpBalance = async (req, res) => {
 };
 
 
+exports.updateFortunePrice = async (req, res) => {
+  const { id } = req.params;
+  const { fortunePrice } = req.body;
+
+  if (!fortunePrice || isNaN(fortunePrice)) {
+    return res.status(400).json({ error: 'Geçerli bir fiyat giriniz.' });
+  }
+
+  try {
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ error: 'Kullanıcı bulunamadı.' });
+    }
+
+    if (user.role !== 'fortuneteller') {
+      return res.status(403).json({ error: 'Sadece falcılar fiyat belirleyebilir.' });
+    }
+
+    user.fortunePrice = fortunePrice;
+    await user.save();
+
+    res.status(200).json({
+      message: 'Fiyat başarıyla güncellendi.',
+      fortunePrice: user.fortunePrice,
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Bir hata oluştu.' });
+  }
+};

@@ -26,7 +26,7 @@ module.exports.verifyToken = (req, res, next) => {
       return res.status(401).json({ error: "Invalid token" });
     }
 
-    req.user = decoded; // Kullanıcı bilgilerini request'e ekle
+    req.user = decoded; 
     next();
   });
 };
