@@ -19,7 +19,8 @@ app.use("/uploads", express.static("uploads"))
 app.use("/api/fortune-requests", FortuneRequest)
 app.use("/api/auth", authRoutes);
 app.use("/api/fortunetellers", fortunetellerRoutes);
-app.use("/api", reviewRoutes);
+app.use("/api/reviews", reviewRoutes);
+app.use('/uploads', express.static('uploads'));
 
 
 

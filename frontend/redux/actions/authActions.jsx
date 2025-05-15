@@ -69,3 +69,26 @@ export const logout = createAsyncThunk('logout', async (_, thunkAPI) => {
     throw error;
   }
 });
+
+export const loadTokenAndAutoLogin = createAsyncThunk(
+  'auth/loadTokenAndAutoLogin',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      if (!token) return rejectWithValue('Token bulunamadı');
+
+      const decoded = parseJwt(token);
+      if (!decoded) return rejectWithValue('Token geçersiz');
+
+      const currentTime = Math.floor(Date.now() / 1000);
+      if (decoded.exp < currentTime) {
+        await AsyncStorage.removeItem('token');
+        return rejectWithValue('Token süresi dolmuş');
+      }
+
+      return { token, user: decoded };
+    } catch (err) {
+      return rejectWithValue(err.message);
+    }
+  }
+);

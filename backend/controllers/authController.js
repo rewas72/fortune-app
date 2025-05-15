@@ -1,6 +1,7 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("../middlewares/jwt");
 const { User } = require("../models");
+const upload = require("../middlewares/upload")
 
 exports.signup = async (req, res) => {
   const { name, email, password } = req.body;
@@ -172,3 +173,26 @@ exports.updateFortunePrice = async (req, res) => {
     res.status(500).json({ error: 'Bir hata oluştu.' });
   }
 };
+
+
+exports.updateProfileImage = async (req, res) => {
+    console.log("Yüklenen dosya:", req.file); // BAK!
+  const {id} = req.params
+
+  if(!req.file){
+    return res.status(400).json({error:"dosya yüklenemedi"})
+  }
+  try {
+    const user= await User.findByPk(id);
+    if (!user) return res.status(404).json({ error: "Kullanıcı bulunamadı." });
+    user.profileImage = req.file.filename;
+    await user.save()
+
+    res.status(200).json({
+      message:"PROFİL FOTOĞRAFI GÜNCELLENDİ",
+      profileImage:user.profileImage,
+    });
+  } catch(error) {
+    res.status(500).json({error:"Bir Hata oluştu"})
+  }
+}

@@ -4,6 +4,10 @@ const sequelize = require("../config/db");
 module.exports = (sequelize, DataTypes) => {
   const User = sequelize.define("User", {
     name: DataTypes.STRING,
+    profileImage: {
+      type: DataTypes.STRING, 
+      allowNull: true,
+    },
     email: {
       type: DataTypes.STRING,
       unique: true,
@@ -23,7 +27,7 @@ module.exports = (sequelize, DataTypes) => {
     },
     fortunePrice: {
       type: DataTypes.FLOAT,
-      defaultValue:0
+      defaultValue: 0
     }
   });
 

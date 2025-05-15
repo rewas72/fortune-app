@@ -1,5 +1,5 @@
 const { Review, FortuneRequest, User } = require("../models");
-const {fn, col} = require("sequelize")
+const { fn, col } = require("sequelize")
 
 exports.createReview = async (req, res) => {
   const { userId, fortunetellerId, rating, comment } = req.body;
@@ -9,7 +9,7 @@ exports.createReview = async (req, res) => {
       where: {
         userId,
         fortunetellerId,
-        status: "completed",
+        status: "answered",
       },
     });
 
@@ -35,29 +35,32 @@ exports.createReview = async (req, res) => {
     res.status(201).json({ message: "Yorum eklendi", review });
   } catch (error) {
     res.status(500).json({ error: "Yorum eklenirken bir hata oluştu." });
+    console.error("Yorum eklenirken hata:", error); // BU SATIRI EKLE
   }
 };
 
 
 exports.getFortuneTellerReviews = async (req, res) => {
-    const {id} = req.params;
+  const { id } = req.params;
 
-    try{
-        const reviews = await Review.findAll({
-            where:{fortuneTellerId:id},
-            include:[
-                {
-                    model:User,
-                    as:"ReviewAuthor",
-                    attributes:["id", "name"]
-                }
-            ],
-            order:[["createdAt","DESC"]],
-        });
-        res.json(reviews)
-    } catch(error) {
+  try {
+    const reviews = await Review.findAll({
+      where: { fortunetellerId: id },
+      include: [
+        {
+          model: User,
+          as: "ReviewAuthor",
+          attributes: ["id", "name"]
+        }
+      ],
+      order: [["createdAt", "DESC"]],
+    });
+    res.json(reviews)
+  } catch (error) {
     res.status(500).json({ error: "Yorumlar getirilirken bir hata oluştu." });
-    }
+    console.error("veriler getirilirken:", error); // BU SATIRI EKLE
+
+  }
 }
 
 // GET /api/fortunetellers/:id/average-rating
