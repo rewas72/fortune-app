@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, FlatList, Image } from 'react-native';
+import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, FlatList, Image, Button } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import { useDispatch, useSelector } from 'react-redux';
@@ -7,6 +7,10 @@ import { fetchAllUsers } from '../redux/features/fortunetellerSlice';
 import { logout } from '../redux/features/authSlice';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AntDesign from '@expo/vector-icons/AntDesign';
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import Entypo from '@expo/vector-icons/Entypo';
+
 
 const colors = {
   siyah: "#121212",
@@ -37,32 +41,45 @@ export default function HomeScreen() {
   };
 
 
-const renderCard = ({ item }) => {
-  const profileImageUrl = item?.profileImage
-    ? `http://192.168.1.100:5000/uploads/${item.profileImage}`
-    : 'https://via.placeholder.com/100';
+  const renderCard = ({ item }) => {
+    const profileImageUrl = item?.profileImage
+      ? `http://192.168.1.100:5000/uploads/${item.profileImage}`
+      : 'https://via.placeholder.com/100';
 
-  return (
-    <TouchableOpacity style={styles.card}>
-      <Image
-        source={{ uri: profileImageUrl }}
-        style={styles.profileImage}
-      />
-      <Text style={styles.name}>{item?.name ?? 'İsimsiz'}</Text>
-      <Text style={styles.price}>💰 {item?.fortunePrice ? `${item.fortunePrice} TL` : 'Belirsiz'}</Text>
-      <Text style={styles.rating}>⭐ {item?.averageRating ? parseFloat(item.averageRating).toFixed(1) : '0.0'}</Text>
-    </TouchableOpacity>
-  );
-};
+    return (
+      <TouchableOpacity style={styles.newCard}>
+        <View style={styles.textContainer}>
+          <Text style={styles.name}>{item?.name ?? 'İsimsiz'}</Text>
+          <View style={styles.infoRow}>
+            <FontAwesome5 name="coins" size={18} color="#555" />
+            <Text style={styles.infoText}>{item?.fortunePrice ?? 50} Kredi</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <AntDesign name="star" size={18} color="black" />
+            <Text style={styles.infoText}>{item?.averageRating ? parseFloat(item.averageRating).toFixed(1) : '0.0'}</Text>
+          </View>
+          <View style={styles.infoRow}>
+            <Entypo name="chat" size={24} color="black" />
+            <Text style={styles.infoText}>Sohbet</Text>
+          </View>
+          <TouchableOpacity style={styles.playButton}>
+            <Text style={styles.playButtonText}>Fal Gönder</Text>
+          </TouchableOpacity>
+        </View>
+
+        <View style={styles.imageContainer}>
+          <Image source={{ uri: profileImageUrl }} style={styles.falciImage} />
+        </View>
+      </TouchableOpacity>
+    );
+  };
 
   return (
     <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Falzade</Text>
-        <TouchableOpacity onPress={handleLogout}>
-          <Text style={styles.logoutText}>Çıkış</Text>
-        </TouchableOpacity>
+          <Text style={styles.logoutText} onPress={handleLogout}>Çıkış Yap</Text>
       </View>
 
       {/* Search */}
@@ -91,16 +108,25 @@ const styles = StyleSheet.create({
     paddingTop: 50,
     paddingHorizontal: 16,
   },
+  infoContainer: {
+    flex: 1,
+    marginLeft: 12,
+  },
+  cardRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
   header: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 16,
   },
   title: {
-    color: colors.beyaz,
+    color: colors.sari,
     fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'center',
   },
   logoutText: {
     color: colors.acikmor,
@@ -121,10 +147,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginHorizontal: 8,
   },
-  cardRow: {
-    justifyContent: 'space-between',
-    marginBottom: 16,
-  },
+
   card: {
     backgroundColor: colors.beyaz,
     borderRadius: 16,
@@ -138,17 +161,24 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
   name: {
-    fontSize: 16,
+    fontSize: 22,
     fontWeight: 'bold',
     color: colors.siyah,
-    marginBottom: 6,
+    marginBottom: 20,
   },
   price: {
+    padding: 4,
+    backgroundColor: colors.gri,
+    borderRadius: 8,
     color: "#444",
     marginBottom: 4,
   },
   rating: {
     color: "#b58900",
+    padding: 4,
+    backgroundColor: colors.gri,
+    borderRadius: 8,
+    marginBottom: 4,
   },
   error: {
     color: colors.beyaz,
@@ -158,9 +188,95 @@ const styles = StyleSheet.create({
   },
   profileImage: {
     width: 80,
-    height: 80,
+    height: 100,
     borderRadius: 40,
-    alignSelf: 'center',
+    alignSelf: "flex-start",
     marginBottom: 10,
   },
+  priceRatingRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-start',
+    gap: 12,
+  },
+  button: {
+    backgroundColor: colors.mor,
+    borderRadius: 8,
+    padding: 10,
+    alignSelf: 'flex-end',
+
+  },
+  buttonText: {
+    color: colors.beyaz,
+    fontSize: 16,
+    fontWeight: 'bold',
+    textAlign: "right",
+  },
+  newCard: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderRadius: 24,
+    overflow: 'hidden',
+    marginBottom: 10,
+    elevation: 5,
+  },
+  textContainer: {
+    flex: 1,
+    padding: 16,
+    justifyContent: 'space-between',
+  },
+  name: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#121212',
+    marginBottom: 8,
+  },
+  infoRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 2,
+    gap: 8,
+  },
+  infoText: {
+    fontSize: 14,
+    color: '#444',
+  },
+  imageContainer: {
+    width: 140,
+    height: 172,
+    position: 'relative',
+  },
+  falciImage: {
+    width: '100%',
+    height: '100%',
+  },
+  playIconContainer: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    backgroundColor: '#896CFE',
+    borderRadius: 20,
+    width: 36,
+    height: 36,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  playIcon: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  playButton: {
+    marginTop: 8,
+    backgroundColor: '#896CFE',
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    alignSelf: 'flex-start',
+  },
+  playButtonText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 14,
+  },
+
 });
