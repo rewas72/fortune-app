@@ -92,3 +92,82 @@ export const loadTokenAndAutoLogin = createAsyncThunk(
     }
   }
 );
+
+
+export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (userId, { rejectWithValue }) => {
+  try {
+    const token = await AsyncStorage.getItem('token');
+
+    const response = await fetch(`http://192.168.1.100:5000/api/auth/users/getUserById/${userId}`, {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok) {
+      return rejectWithValue(data.error || 'Bir hata oluştu');
+    }
+
+    return data;
+  } catch (error) {
+    return rejectWithValue(error.message);
+  }
+});
+
+
+export const updateUserProfileImage = createAsyncThunk(
+  'user/updateProfileImage',
+  async ({ userId, image }, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+
+      const formData = new FormData();
+      formData.append('profileImage', {
+        uri: image.uri,
+        name: 'profile.jpg',
+        type: 'image/jpeg',
+      });
+
+      const response = await fetch(`http://192.168.1.100:5000/api/auth/users/${userId}`, {
+        method: 'PUT',
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        return rejectWithValue(data.error || 'Bir hata oluştu');
+      }
+
+      return data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+
+export const updateUser = createAsyncThunk('updateUser', async (body,api) => {
+
+  try {
+    const { data } = await axios.put(`http://192.168.1.100:5000/api/auth/users/${userId}`, body, {
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${localStorage.getItem("token")}`
+      },
+
+    });
+
+    api.dispatch(getProfile())
+    return data;
+
+  } catch (error) {
+    console.log(error);
+  }
+
+});

@@ -10,16 +10,20 @@ export default function AuthLoadingScreen() {
   const { token, role, loading } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    dispatch(loadTokenAndAutoLogin()).then((res) => {
-      if (res.meta.requestStatus === 'fulfilled') {
-        if (res.payload?.user?.role === 'fortuneteller') {
-          navigation.reset({ index: 0, routes: [{ name: 'FalciHome' }] });
-        } else {
-          navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
-        }
+  dispatch(loadTokenAndAutoLogin()).then((res) => {
+    console.log('Auto login sonucu:', res);
+    if (res.meta?.requestStatus === 'fulfilled') {
+      if (res.payload?.user?.role === 'fortuneteller') {
+        navigation.reset({ index: 0, routes: [{ name: 'FalciHome' }] });
+      } else {
+        navigation.reset({ index: 0, routes: [{ name: 'Home' }] });
       }
-    });
-  }, [dispatch]);
+    } else {
+      navigation.reset({ index: 0, routes: [{ name: 'Start' }] });
+    }
+  });
+}, [dispatch]);
+
 
   return (
     <View style={styles.container}>

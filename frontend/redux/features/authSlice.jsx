@@ -1,6 +1,7 @@
 // redux/slices/authSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { login,loadTokenAndAutoLogin } from '../actions/authActions';
+import { login, loadTokenAndAutoLogin, fetchUserProfile, updateUserProfileImage, updateUser } from '../actions/authActions';
+
 
 const initialState = {
   token: null,
@@ -19,6 +20,10 @@ const authSlice = createSlice({
       state.loading = false;
       state.error = null;
     },
+    setUserInfo: (state, action) => {
+      state.user = action.payload
+     
+    }
   },
   extraReducers: (builder) => {
     builder
@@ -50,7 +55,38 @@ const authSlice = createSlice({
         state.user = null;
         state.error = action.payload || action.error.message;
       })
-      
+      .addCase(fetchUserProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(fetchUserProfile.fulfilled, (state, action) => {
+        console.log("Profil yükleme hatası:", action.payload);
+        state.loading = false;
+        state.profile = action.payload;
+      })
+      .addCase(fetchUserProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateUserProfileImage.fulfilled, (state, action) => {
+        state.profile = action.payload;
+      })
+      .addCase(updateUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(updateUser.fulfilled, (state, action) => {
+        state.loading = false;
+        state.userInfo = action.payload;
+        state.success = true;
+      })
+      .addCase(updateUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Bir hata oluştu.";
+        state.success = false;
+      });
+
   },
 });
 

@@ -7,6 +7,7 @@ router.post("/signup", authController.signup);
 router.post("/login", authController.login);
 router.post("/fortuneteller-login", authController.fortunetellerLogin);
 router.get("/users", authController.getAllUsers);
+router.get("/users/getUserById/:id", authController.getUserById);
 router.put("/users/:id", authController.updateUser);
 router.put("/users/:id/topup", authController.topUpBalance);
 router.patch('/users/:id/price', authController.updateFortunePrice);
