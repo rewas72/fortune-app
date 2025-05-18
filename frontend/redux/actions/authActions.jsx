@@ -152,22 +152,28 @@ export const updateUserProfileImage = createAsyncThunk(
 );
 
 
-export const updateUser = createAsyncThunk('updateUser', async (body,api) => {
-
+export const updateUser = createAsyncThunk('updateUser', async (body, api) => {
+  const { userId, ...rest } = body;  // userId’yi ayır
   try {
-    const { data } = await axios.put(`http://192.168.1.100:5000/api/auth/users/${userId}`, body, {
+    const token = await AsyncStorage.getItem('token');  // AsyncStorage kullan (localStorage değil)
+    const response = await fetch(`http://192.168.1.100:5000/api/auth/users/${userId}`, {
+      method: 'PUT',
       headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${localStorage.getItem("token")}`
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
       },
-
+      body: JSON.stringify(rest),
     });
 
-    api.dispatch(getProfile())
+    const data = await response.json();
+
+    if (!response.ok) {
+      throw new Error(data.message || 'Güncelleme hatası');
+    }
+
     return data;
-
   } catch (error) {
-    console.log(error);
+    console.log('Update Error:', error);
+    throw error;
   }
-
 });

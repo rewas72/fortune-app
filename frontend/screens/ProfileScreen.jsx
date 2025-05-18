@@ -16,6 +16,10 @@ import {
   updateUser,
 } from '../redux/actions/authActions';
 import * as ImagePicker from 'expo-image-picker';
+import { logout } from '../redux/features/authSlice';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 
 const colors = {
   siyah: '#121212',
@@ -27,6 +31,8 @@ const colors = {
 };
 
 export default function ProfileScreen() {
+  const navigation = useNavigation();
+
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.auth.profile);
   const user = useSelector((state) => state.auth.user);
@@ -51,7 +57,7 @@ export default function ProfileScreen() {
 
   const pickImage = async () => {
     let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
+      mediaTypes: ['images'],
       allowsEditing: true,
       aspect: [4, 3],
       quality: 1,
@@ -75,9 +81,13 @@ export default function ProfileScreen() {
     setIsEditingEmail(false);
   };
   if (!profile) return <Text>Yükleniyor...</Text>;
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('token');
+    dispatch(logout());
+    navigation.navigate("Start");
+  };
 
   console.log("Updated profile:", profile);
-  console.log("Edited name:", editedName);
 
   return (
     <View style={styles.container}>
@@ -130,7 +140,7 @@ export default function ProfileScreen() {
           )}
           {renderMenuItem('Şifre Değiştir', null, 'key-outline')}
           {renderMenuItem('Gizlilik Politikası', null, 'document-lock-outline')}
-          {renderMenuItem('Çıkış Yap', null, 'exit-outline')}
+          {renderMenuItem('Çıkış Yap', null, 'exit-outline', null, false, null, null, null, null, handleLogout)}
         </View>
       </ScrollView>
     </View>
@@ -146,13 +156,18 @@ const renderMenuItem = (
   onEditToggle,
   value,
   onChangeText,
-  onSave
+  onSave,
+  onPress
 ) => (
   <View style={styles.menuItem} key={title}>
+  
     <View style={styles.menuIcon}>
       <Ionicons name={icon} size={22} color="#C9A3FF" />
     </View>
-    <Text style={styles.menuText}>{title}</Text>
+    <TouchableOpacity  onPress={onPress}>
+       <Text style={styles.menuText}>{title}</Text>
+    </TouchableOpacity>
+   
 
     {isEditing ? (
       <View style={styles.inputContainer}>
@@ -162,6 +177,7 @@ const renderMenuItem = (
           placeholder={title}
           placeholderTextColor="#999"
           style={styles.input}
+         
         />
         <TouchableOpacity onPress={onSave}>
           <Ionicons name="checkmark-outline" size={20} color="#C9A3FF" />
@@ -252,7 +268,8 @@ const styles = StyleSheet.create({
     borderBottomColor: '#222',
   },
   menuIcon: {
-    marginRight: 15,
+    marginRight: "15",
+
   },
   menuText: {
     color: 'white',

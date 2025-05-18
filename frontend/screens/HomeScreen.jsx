@@ -79,7 +79,6 @@ export default function HomeScreen() {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.title}>Falzade</Text>
-          <Text style={styles.logoutText} onPress={handleLogout}>Çıkış Yap</Text>
       </View>
 
       {/* Search */}
