@@ -32,7 +32,6 @@ const colors = {
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-
   const dispatch = useDispatch();
   const profile = useSelector((state) => state.auth.profile);
   const user = useSelector((state) => state.auth.user);
@@ -138,7 +137,7 @@ export default function ProfileScreen() {
             setEditedEmail,
             handleEmailSave
           )}
-          {renderMenuItem('Şifre Değiştir', null, 'key-outline')}
+          {renderMenuItem('Şifre Değiştir', null, 'key-outline', null, false, null, null, null, null, () => navigation.navigate('ChangePassword'))}
           {renderMenuItem('Gizlilik Politikası', null, 'document-lock-outline')}
           {renderMenuItem('Çıkış Yap', null, 'exit-outline', null, false, null, null, null, null, handleLogout)}
         </View>

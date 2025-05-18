@@ -6,6 +6,7 @@ import { Ionicons } from '@expo/vector-icons';
 import ProfileScreen from '../screens/ProfileScreen';
 import BalanceScreen from '../screens/BalanceScreen';
 import Fortune from '../screens/Fortune';
+import ChangePassword from '../screens/ChangePassword';
 
 const Tab = createBottomTabNavigator();
 

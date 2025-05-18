@@ -13,6 +13,7 @@ import AuthLoadingScreen from './AuthLoadingScreen';
 import { loadTokenAndAutoLogin } from './redux/actions/authActions';
 import FalciTabs from './navigations/FalciTabs';
 import MainTabs from './navigations/MainTabs';
+import ChangePassword from './screens/ChangePassword';
 
 const Stack = createNativeStackNavigator();
 
@@ -33,6 +34,7 @@ function MainApp() {
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Home" component={MainTabs} />
         <Stack.Screen name="FalciHome" component={FalciTabs} />
+        <Stack.Screen name="ChangePassword" component={ChangePassword} />
       </Stack.Navigator>
     </NavigationContainer>
   );
