@@ -1,6 +1,6 @@
 // redux/slices/authSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { login, loadTokenAndAutoLogin, fetchUserProfile, updateUserProfileImage, updateUser } from '../actions/authActions';
+import { login, loadTokenAndAutoLogin, fetchUserProfile, updateUserProfileImage, updateUser, changePassword } from '../actions/authActions';
 
 
 const initialState = {
@@ -22,8 +22,13 @@ const authSlice = createSlice({
     },
     setUserInfo: (state, action) => {
       state.user = action.payload
-     
-    }
+
+    },
+    clearStatus: (state) => {
+      state.loading = false;
+      state.error = null;
+      state.success = false;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -85,10 +90,26 @@ const authSlice = createSlice({
         state.loading = false;
         state.error = action.payload || "Bir hata oluştu.";
         state.success = false;
+      })
+      .addCase(changePassword.pending, (state) => {
+        console.log("Şifre güncelleme başlatıldı");
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+      })
+      .addCase(changePassword.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || 'Şifre değiştirilemedi';
+        state.success = false;
       });
+
 
   },
 });
 
-export const { logout } = authSlice.actions;
+export const { logout, clearStatus } = authSlice.actions;
 export default authSlice.reducer;

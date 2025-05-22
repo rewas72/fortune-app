@@ -133,14 +133,29 @@ exports.topUpBalance = async (req, res) => {
     const user = await User.findByPk(id);
     if (!user) return res.status(404).json({ error: "Kullanıcı bulunamadı" });
 
-    user.balance += parseFloat(amount);
+    console.log("Mevcut bakiye:", user.balance); // debug
+
+    const currentBalance = parseFloat(user.balance) || 0;
+    const addedAmount = parseFloat(amount);
+
+    if (isNaN(addedAmount)) {
+      return res.status(400).json({ error: "Geçersiz bakiye miktarı" });
+    }
+
+    const newBalance = currentBalance + addedAmount;
+    user.balance = newBalance;
+
     await user.save();
+
+    console.log("Güncellenmiş bakiye:", user.balance); // debug
 
     res.json({ message: "Bakiye yüklendi", balance: user.balance });
   } catch (err) {
+    console.error("Hata:", err);
     res.status(500).json({ error: "Bakiye güncellenemedi" });
   }
 };
+
 
 
 exports.updateFortunePrice = async (req, res) => {
@@ -214,3 +229,28 @@ exports.getUserById = async (req, res) => {
     res.status(500).json({ error: "Bir hata oluştu" });
   }
 };
+
+
+exports.changePassword = async (req, res) => {
+  const {id} = req.params;
+  const {currentPassword, newPassword} = req.body;
+
+  try {
+    const user = await User.findByPk(id);
+    if (!user) {
+      return res.status(404).json({error:"kullanıcı bulunamadı"})
+    }
+
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if(!isMatch){
+      return status(400).json({error:"eski şifre yanlış"})
+    }
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    user.password = hashedPassword;
+    await user.save()
+    res.status(200).json({message:"şifre başarıyla değiştirildi"})
+  } catch (error) {
+    res.status(500).json({error:"şifre değiştirilemedi"})
+  }
+}
+

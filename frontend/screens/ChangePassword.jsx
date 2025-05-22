@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import { useNavigation } from '@react-navigation/native';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -8,6 +9,11 @@ import {
     SafeAreaView,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { useDispatch, useSelector } from 'react-redux';
+import { clearStatus } from '../redux/features/authSlice';
+import { changePassword } from '../redux/actions/authActions';
+import { jwtDecode } from 'jwt-decode';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 
 const colors = {
@@ -20,7 +26,10 @@ const colors = {
 };
 
 
-const ChangePassword = ({ navigation }) => {
+const ChangePassword = () => {
+    const navigation = useNavigation();
+    const dispatch = useDispatch();
+    const { loading, error, success } = useSelector((state) => state.auth);
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
@@ -29,10 +38,64 @@ const ChangePassword = ({ navigation }) => {
         new: true,
         confirm: true,
     });
+    const [id, setId] = useState(null);
+    const [token, setToken] = useState(null);
 
     const toggleSecure = (field) => {
         setSecureText((prev) => ({ ...prev, [field]: !prev[field] }));
     };
+
+    const handleSubmit = () => {
+        console.log("handleSubmit çalıştı");
+
+        if (!currentPassword || !newPassword || !confirmPassword) {
+            alert("Lütfen tüm alanları doldurun.");
+            return;
+        }
+
+        if (newPassword !== confirmPassword) {
+            alert("Yeni şifreler eşleşmiyor.");
+            return;
+        }
+
+        if (!id || !token) {
+            alert("Kullanıcı bilgileri alınamadı.");
+            return;
+        }
+
+        dispatch(changePassword({ id, currentPassword, newPassword, token }));
+    };
+
+
+    useEffect(() => {
+        if (success) {
+            alert("Şifre başarıyla güncellendi");
+            dispatch(clearStatus());
+            navigation.goBack();
+        }
+        if (error) {
+            alert(error);
+            dispatch(clearStatus());
+        }
+    }, [success, error]);
+
+    useEffect(() => {
+        const getUserData = async () => {
+            try {
+                const tokenFromStorage = await AsyncStorage.getItem('token');
+                if (tokenFromStorage) {
+                    const decoded = jwtDecode(tokenFromStorage);
+                    setId(decoded.userId || decoded.id); // JWT payload'daki kullanıcı ID'ye göre
+                    setToken(tokenFromStorage);
+                }
+            } catch (err) {
+                console.log("Token alınırken hata:", err);
+            }
+        };
+
+        getUserData();
+    }, []);
+
 
     return (
         <SafeAreaView style={styles.container}>
@@ -41,19 +104,19 @@ const ChangePassword = ({ navigation }) => {
                 <TouchableOpacity onPress={() => navigation.goBack()}>
                     <Icon name="arrow-back" size={24} color={colors.acikmor} />
                 </TouchableOpacity>
-                <Text style={styles.headerTitle}>Password Settings</Text>
+                <Text style={styles.headerTitle}>Şifre Değiştir</Text>
             </View>
 
             <View style={styles.formContainer}>
                 {/* Current Password */}
-                <Text style={styles.label}>Current Password</Text>
+                <Text style={styles.label}>Eski Şifre</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
                         secureTextEntry={secureText.current}
                         style={styles.input}
                         value={currentPassword}
                         onChangeText={setCurrentPassword}
-                        placeholder="Enter current password"
+                        placeholder="Eski şifreyi girin"
                         placeholderTextColor="#999"
                     />
                     <TouchableOpacity onPress={() => toggleSecure('current')}>
@@ -65,18 +128,18 @@ const ChangePassword = ({ navigation }) => {
                     </TouchableOpacity>
                 </View>
                 <TouchableOpacity style={{ alignSelf: 'center', marginBottom: 16 }}>
-                    <Text style={styles.forgotText}>Forgot Password?</Text>
+                    <Text style={styles.forgotText}>Şifreni mi unuttun?</Text>
                 </TouchableOpacity>
 
                 {/* New Password */}
-                <Text style={styles.label}>New Password</Text>
+                <Text style={styles.label}>Yeni Şifre</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
                         secureTextEntry={secureText.new}
                         style={styles.input}
                         value={newPassword}
                         onChangeText={setNewPassword}
-                        placeholder="Enter new password"
+                        placeholder="Yeni şifreyi girin"
                         placeholderTextColor="#999"
                     />
                     <TouchableOpacity onPress={() => toggleSecure('new')}>
@@ -89,14 +152,14 @@ const ChangePassword = ({ navigation }) => {
                 </View>
 
                 {/* Confirm New Password */}
-                <Text style={styles.label}>Confirm New Password</Text>
+                <Text style={styles.label}>Yeni Şifreni Onayla</Text>
                 <View style={styles.inputContainer}>
                     <TextInput
                         secureTextEntry={secureText.confirm}
                         style={styles.input}
                         value={confirmPassword}
                         onChangeText={setConfirmPassword}
-                        placeholder="Confirm new password"
+                        placeholder="Yeni şifreyi onaylayın"
                         placeholderTextColor="#999"
                     />
                     <TouchableOpacity onPress={() => toggleSecure('confirm')}>
@@ -109,18 +172,12 @@ const ChangePassword = ({ navigation }) => {
                 </View>
 
                 {/* Submit Button */}
-                <TouchableOpacity style={styles.button}>
-                    <Text style={styles.buttonText}>Change Password</Text>
+                <TouchableOpacity onPress={handleSubmit} style={styles.button}>
+                    <Text style={styles.buttonText}>Şifreyi Değiştir</Text>
                 </TouchableOpacity>
             </View>
 
-            {/* Bottom Navigation Placeholder */}
-            <View style={styles.bottomBar}>
-                <Icon name="home-outline" size={24} color="white" />
-                <Icon name="receipt-outline" size={24} color="white" />
-                <Icon name="star-outline" size={24} color="white" />
-                <Icon name="headset-outline" size={24} color="white" />
-            </View>
+
         </SafeAreaView>
     );
 
@@ -143,12 +200,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         color: '#A084E8',
     },
-    label: {
-        color: '#A084E8',
-        fontSize: 14,
-        marginBottom: 6,
-        marginTop: 10,
-    },
+
     inputContainer: {
         backgroundColor: '#fff',
         alignItems: 'center',
@@ -171,6 +223,9 @@ const styles = StyleSheet.create({
     forgotText: {
         color: 'white',
         fontSize: 12,
+        alignSelf: 'flex-end',
+        textAlign: 'right',
+
     },
     button: {
         backgroundColor: '#E9F94A',
@@ -184,18 +239,8 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         fontSize: 16,
     },
-    bottomBar: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        backgroundColor: '#A084E8',
-        paddingVertical: 14,
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        right: 0,
-        borderTopLeftRadius: 15,
-        borderTopRightRadius: 15,
-    },
+
+
     formContainer: {
         alignItems: 'center',
         justifyContent: 'center',
@@ -205,7 +250,8 @@ const styles = StyleSheet.create({
         fontSize: 14,
         marginBottom: 6,
         marginTop: 10,
-        alignSelf: 'center',
+        marginLeft: 30,
+        alignSelf: 'flex-start',
     },
     inputContainer: {
         backgroundColor: colors.beyaz,

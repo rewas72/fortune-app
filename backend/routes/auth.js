@@ -16,5 +16,6 @@ router.post(
   upload.single("profileImage"),
   authController.updateProfileImage
 );
+router.put("/users/change-password/:id", authController.changePassword);
 
 module.exports = router;

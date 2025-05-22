@@ -2,6 +2,7 @@
 import { createAsyncThunk } from '@reduxjs/toolkit';
 import jwtDecode from 'jwt-decode';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 
 
@@ -177,3 +178,28 @@ export const updateUser = createAsyncThunk('updateUser', async (body, api) => {
     throw error;
   }
 });
+
+
+
+export const changePassword = createAsyncThunk(
+  'user/changePassword',
+  async ({ id, currentPassword, newPassword }, { rejectWithValue }) => {
+    try {
+      const token = await AsyncStorage.getItem('token');
+      const res = await axios.put(
+        `http://192.168.1.100:5000/api/auth/users/change-password/${id}`,
+        { currentPassword, newPassword },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      return res.data;
+    } catch (err) {
+      return rejectWithValue(
+        err.response?.data?.error || 'Şifre güncellenemedi.'
+      );
+    }
+  }
+);
