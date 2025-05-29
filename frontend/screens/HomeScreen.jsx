@@ -34,12 +34,6 @@ export default function HomeScreen() {
     });
   }, [dispatch]);
 
-  const handleLogout = async () => {
-    await AsyncStorage.removeItem('token');
-    dispatch(logout());
-    navigation.navigate("Start");
-  };
-
 
   const renderCard = ({ item }) => {
     const profileImageUrl = item?.profileImage
@@ -62,8 +56,8 @@ export default function HomeScreen() {
             <Entypo name="chat" size={24} color="black" />
             <Text style={styles.infoText}>Sohbet</Text>
           </View>
-          <TouchableOpacity style={styles.playButton}>
-            <Text style={styles.playButtonText}>Fal Gönder</Text>
+          <TouchableOpacity onPress={()=> navigation.navigate('sendFortune', {fortuneTellerId: item.id})} style={styles.playButton}>
+            <Text  style={styles.playButtonText}>Fal Gönder</Text>
           </TouchableOpacity>
         </View>
 

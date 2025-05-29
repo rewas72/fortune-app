@@ -13,6 +13,8 @@ db.FortuneRequestImage = require("./FortuneRequestImage")(sequelize, Sequelize.D
 
 // İlişkiler
 
+
+
 // Kullanıcının kendi gönderdiği fallar
 db.User.hasMany(db.FortuneRequest, { foreignKey: "userId", as: "SentRequests" });
 db.FortuneRequest.belongsTo(db.User, { foreignKey: "userId", as: "Sender" });
@@ -30,7 +32,7 @@ db.User.hasMany(db.Review, { foreignKey: "fortunetellerId", as: "ReceivedReviews
 db.Review.belongsTo(db.User, { foreignKey: "fortunetellerId", as: "ReviewedFortuneteller" });
 
 // Fal isteğine ait görseller
-db.FortuneRequest.hasMany(db.FortuneRequestImage, { foreignKey: "fortuneRequestId", as: "Images" });
+db.FortuneRequest.hasMany(db.FortuneRequestImage, { foreignKey: "fortuneRequestId", as: "images" });
 db.FortuneRequestImage.belongsTo(db.FortuneRequest, { foreignKey: "fortuneRequestId", as: "Request" });
 
 module.exports = db;
