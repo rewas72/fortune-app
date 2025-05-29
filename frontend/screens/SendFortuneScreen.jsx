@@ -61,7 +61,7 @@ export default function SendFortuneScreen() {
     formData.append('gender', gender);
     formData.append('relationshipStatus', relationshipStatus);
     formData.append('userId', userId);
-    formData.append('fortuneTellerId', fortuneTellerId);
+    formData.append('fortuneTellerId', String(fortuneTellerId));
 
     images.forEach((img, index) => {
       formData.append('images', {
@@ -80,6 +80,8 @@ export default function SendFortuneScreen() {
         Alert.alert('Hata', res.payload?.error || 'Fal gönderilemedi.');
       }
     });
+    console.log("Gönderilen fortuneTellerId:", fortuneTellerId);
+
   };
 
   const onDateChange = (event, selectedDate) => {

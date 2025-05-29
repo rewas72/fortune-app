@@ -1,6 +1,5 @@
-const { DataTypes } = require("sequelize");
-
 module.exports = (sequelize, DataTypes) => {
+  
   const FortuneRequest = sequelize.define("FortuneRequest", {
     message: DataTypes.TEXT,
     status: {
@@ -10,7 +9,11 @@ module.exports = (sequelize, DataTypes) => {
     answer: DataTypes.TEXT,
     birthDate: DataTypes.DATEONLY,
     gender: DataTypes.STRING,
-    relationshipStatus: DataTypes.STRING
+    relationshipStatus: DataTypes.STRING,
+    fortunetellerId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   });
 
   FortuneRequest.associate = (models) => {
