@@ -97,7 +97,7 @@ export default function ProfileScreen() {
             <Image
               source={{
                 uri: profile.profileImage
-                  ? `http://192.168.1.100:5000/uploads/${profile.profileImage}`
+                  ? `http://192.168.1.15:5000/uploads/${profile.profileImage}`
                   : 'https://randomuser.me/api/portraits/women/44.jpg',
               }}
               style={styles.avatar}

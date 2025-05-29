@@ -25,7 +25,7 @@ function parseJwt(token) {
 
 export const login = createAsyncThunk('login', async data => {
   try {
-    const response = await fetch(`http://192.168.1.100:5000/api/auth/login`, {
+    const response = await fetch(`http://192.168.1.15:5000/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -99,7 +99,7 @@ export const fetchUserProfile = createAsyncThunk('user/fetchProfile', async (use
   try {
     const token = await AsyncStorage.getItem('token');
 
-    const response = await fetch(`http://192.168.1.100:5000/api/auth/users/getUserById/${userId}`, {
+    const response = await fetch(`http://192.168.1.15:5000/api/auth/users/getUserById/${userId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -131,7 +131,7 @@ export const updateUserProfileImage = createAsyncThunk(
         type: 'image/jpeg',
       });
 
-      const response = await fetch(`http://192.168.1.100:5000/api/auth/users/${userId}`, {
+      const response = await fetch(`http://192.168.1.15:5000/api/auth/users/${userId}`, {
         method: 'PUT',
         headers: {
           Authorization: `Bearer ${token}`,
@@ -157,7 +157,7 @@ export const updateUser = createAsyncThunk('updateUser', async (body, api) => {
   const { userId, ...rest } = body;  // userId’yi ayır
   try {
     const token = await AsyncStorage.getItem('token');  // AsyncStorage kullan (localStorage değil)
-    const response = await fetch(`http://192.168.1.100:5000/api/auth/users/${userId}`, {
+    const response = await fetch(`http://192.168.1.15:5000/api/auth/users/${userId}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -187,7 +187,7 @@ export const changePassword = createAsyncThunk(
     try {
       const token = await AsyncStorage.getItem('token');
       const res = await axios.put(
-        `http://192.168.1.100:5000/api/auth/users/change-password/${id}`,
+        `http://192.168.1.15:5000/api/auth/users/change-password/${id}`,
         { currentPassword, newPassword },
         {
           headers: {

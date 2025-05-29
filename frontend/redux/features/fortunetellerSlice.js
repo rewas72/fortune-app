@@ -5,7 +5,7 @@ import axios from "axios";
 export const fetchAllUsers = createAsyncThunk(
     "fortuneteller/fetchAllUsers",
     async () => {
-        const response = await axios.get("http://192.168.1.100:5000/api/auth/users");
+        const response = await axios.get("http://192.168.1.15:5000/api/auth/users");
         return response.data;
     }
 );

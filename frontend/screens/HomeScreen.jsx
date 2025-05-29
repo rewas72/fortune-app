@@ -43,7 +43,7 @@ export default function HomeScreen() {
 
   const renderCard = ({ item }) => {
     const profileImageUrl = item?.profileImage
-      ? `http://192.168.1.100:5000/uploads/${item.profileImage}`
+      ? `http://192.168.1.15:5000/uploads/${item.profileImage}`
       : 'https://via.placeholder.com/100';
 
     return (
