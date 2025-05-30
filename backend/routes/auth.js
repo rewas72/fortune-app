@@ -17,5 +17,10 @@ router.post(
   authController.updateProfileImage
 );
 router.put("/users/change-password/:id", authController.changePassword);
+router.patch(
+  "/users/:id/fortune/description",
+  authController.updateFortuneTellerDescription
+);
+
 
 module.exports = router;

@@ -1,22 +1,19 @@
 // src/redux/slices/fortunetellerSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
+import { fetchAllUsers, fetchFortuneTellerDetails } from "../actions/fortunetellerActions";
 
-export const fetchAllUsers = createAsyncThunk(
-    "fortuneteller/fetchAllUsers",
-    async () => {
-        const response = await axios.get("http://192.168.1.15:5000/api/auth/users");
-        return response.data;
-    }
-);
+
 
 const fortunetellerSlice = createSlice({
     name: "fortuneteller",
     initialState: {
         loading: false,
         error: null,
-        fortunetellers: [], 
+        fortunetellers: [],
+        allFortunetellers: [],
         filteredFortunetellers: [],
+        selectedFortuneTeller: null,
     },
     reducers: {
         sortByPriceAsc: (state) => {
@@ -56,6 +53,15 @@ const fortunetellerSlice = createSlice({
             .addCase(fetchAllUsers.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message;
+            })
+            .addCase(fetchFortuneTellerDetails.pending, (s) => {
+                s.loading = true; s.error = null; s.selectedFortuneTeller = null;
+            })
+            .addCase(fetchFortuneTellerDetails.fulfilled, (s, a) => {
+                s.loading = false; s.selectedFortuneTeller = a.payload;
+            })
+            .addCase(fetchFortuneTellerDetails.rejected, (s, a) => {
+                s.loading = false; s.error = a.error.message;
             });
     },
 });

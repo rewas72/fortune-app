@@ -1,15 +1,23 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, TextInput, View, TouchableOpacity, ScrollView, FlatList, Image, Button } from 'react-native';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import Octicons from '@expo/vector-icons/Octicons';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchAllUsers } from '../redux/features/fortunetellerSlice';
 import { logout } from '../redux/features/authSlice';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import AntDesign from '@expo/vector-icons/AntDesign';
 import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
 import Entypo from '@expo/vector-icons/Entypo';
+import {
+  sortByPriceAsc,
+  sortByPriceDesc,
+  sortByRatingDesc,
+  resetSorting,
+} from '../redux/features/fortunetellerSlice';
+import { Modal, Pressable } from 'react-native';
+import { useMemo } from 'react';
+import { fetchAllUsers } from '../redux/actions/fortunetellerActions';
 
 
 const colors = {
@@ -27,6 +35,31 @@ export default function HomeScreen() {
   const { loading, error, filteredFortunetellers } = useSelector(
     (state) => state.fortuneteller
   );
+  const [sortMenuVisible, setSortMenuVisible] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+
+const filteredList = filteredFortunetellers.filter(item =>
+  item.name?.toLowerCase().includes(searchTerm.toLowerCase())
+);
+
+
+
+  const handleSort = (type) => {
+    setSortMenuVisible(false);
+    switch (type) {
+      case 'priceAsc':
+        dispatch(sortByPriceAsc());
+        break;
+      case 'priceDesc':
+        dispatch(sortByPriceDesc());
+        break;
+      case 'ratingDesc':
+        dispatch(sortByRatingDesc());
+        break;
+      default:
+        dispatch(resetSorting());
+    }
+  }
 
   useEffect(() => {
     dispatch(fetchAllUsers()).then((res) => {
@@ -35,13 +68,15 @@ export default function HomeScreen() {
   }, [dispatch]);
 
 
+
+
   const renderCard = ({ item }) => {
     const profileImageUrl = item?.profileImage
       ? `http://192.168.1.15:5000/uploads/${item.profileImage}`
       : 'https://via.placeholder.com/100';
 
     return (
-      <TouchableOpacity style={styles.newCard}>
+      <TouchableOpacity style={styles.newCard} onPress={() => navigation.navigate('FortuneTellerDetail', { id: item.id })}>
         <View style={styles.textContainer}>
           <Text style={styles.name}>{item?.name ?? 'İsimsiz'}</Text>
           <View style={styles.infoRow}>
@@ -56,8 +91,8 @@ export default function HomeScreen() {
             <Entypo name="chat" size={24} color="black" />
             <Text style={styles.infoText}>Sohbet</Text>
           </View>
-          <TouchableOpacity onPress={()=> navigation.navigate('sendFortune', {fortuneTellerId: item.id})} style={styles.playButton}>
-            <Text  style={styles.playButtonText}>Fal Gönder</Text>
+          <TouchableOpacity onPress={() => navigation.navigate('sendFortune', { fortuneTellerId: item.id })} style={styles.playButton}>
+            <Text style={styles.playButtonText}>Fal Gönder</Text>
           </TouchableOpacity>
         </View>
 
@@ -78,13 +113,48 @@ export default function HomeScreen() {
       {/* Search */}
       <View style={styles.searchContainer}>
         <EvilIcons name="search" size={24} color={colors.siyah} />
-        <TextInput placeholder="Falcı Ara" placeholderTextColor="#888" style={styles.textInput} />
-        <Octicons name="sort-asc" size={20} color={colors.siyah} />
+        <TextInput placeholder="Falcı Ara" placeholderTextColor="#888" style={styles.textInput} value={searchTerm} onChangeText={setSearchTerm} />
+        <TouchableOpacity onPress={() => setSortMenuVisible(true)}>
+          <Octicons name="sort-asc" size={20} color={colors.siyah} />
+          <Modal
+            animationType="fade"
+            transparent={true}
+            visible={sortMenuVisible}
+            onRequestClose={() => setSortMenuVisible(false)}
+          >
+            <View style={styles.modalOverlay}>
+              <View style={styles.modalContainer}>
+                <Text style={styles.modalTitle}>Sırala</Text>
+
+                <TouchableOpacity style={styles.modalButton} onPress={() => handleSort('priceAsc')}>
+                  <Text style={styles.modalButtonText}>💸 Fiyat (Artan)</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.modalButton} onPress={() => handleSort('priceDesc')}>
+                  <Text style={styles.modalButtonText}>💰 Fiyat (Azalan)</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.modalButton} onPress={() => handleSort('ratingDesc')}>
+                  <Text style={styles.modalButtonText}>⭐ Puan (Yüksek)</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.modalButton} onPress={() => handleSort('reset')}>
+                  <Text style={styles.modalButtonText}>🔄 Sıralamayı Sıfırla</Text>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.modalCloseButton} onPress={() => setSortMenuVisible(false)}>
+                  <Text style={styles.modalCloseButtonText}>Kapat</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
+          </Modal>
+
+        </TouchableOpacity>
       </View>
 
       {/* Card List */}
       <FlatList
-        data={filteredFortunetellers}
+        data={filteredList}
         renderItem={renderCard}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingBottom: 100 }}
@@ -271,5 +341,65 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     fontSize: 14,
   },
+  modalOverlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+
+  modalContainer: {
+    backgroundColor: '#fff',
+    borderRadius: 20,
+    paddingVertical: 24,
+    paddingHorizontal: 20,
+    width: '80%',
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    alignItems: 'center',
+  },
+
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 20,
+    color: '#333',
+  },
+
+  modalButton: {
+    backgroundColor: '#896CFE',
+    borderRadius: 12,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    marginBottom: 10,
+    width: '100%',
+  },
+
+  modalButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+
+  modalCloseButton: {
+    marginTop: 10,
+    backgroundColor: '#ccc',
+    borderRadius: 10,
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    width: '100%',
+  },
+
+  modalCloseButtonText: {
+    color: '#333',
+    fontSize: 16,
+    textAlign: 'center',
+    fontWeight: '600',
+  },
+
 
 });

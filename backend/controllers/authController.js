@@ -190,6 +190,46 @@ exports.updateFortunePrice = async (req, res) => {
 };
 
 
+exports.updateFortuneTellerDescription = async (req, res) => {
+  const { id } = req.params;                        // /users/:id/fortune/description
+  const { fortuneTellerDescription } = req.body;    // JSON body: { "fortuneTellerDescription": "..." }
+
+  /* 1. Basit doğrulama */
+  if (
+    !fortuneTellerDescription ||
+    typeof fortuneTellerDescription !== "string" ||
+    fortuneTellerDescription.trim().length === 0
+  ) {
+    return res
+      .status(400)
+      .json({ error: "Geçerli bir açıklama metni giriniz." });
+  }
+
+  try {
+    /* 2. Kullanıcıyı bul */
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ error: "Kullanıcı bulunamadı." });
+    }
+
+   
+
+    /* 4. Açıklamayı güncelle ve kaydet */
+    user.fortuneTellerDescription = fortuneTellerDescription.trim();
+    await user.save();
+
+    /* 5. Başarılı yanıt */
+    return res.status(200).json({
+      message: "Açıklama başarıyla güncellendi.",
+      fortuneTellerDescription: user.fortuneTellerDescription,
+    });
+  } catch (error) {
+    console.error("updateFortuneTellerDescription error ➜", error);
+    return res.status(500).json({ error: "Bir sunucu hatası oluştu." });
+  }
+};
+
 exports.updateProfileImage = async (req, res) => {
     console.log("Yüklenen dosya:", req.file); // BAK!
   const {id} = req.params

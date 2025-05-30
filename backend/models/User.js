@@ -28,7 +28,11 @@ module.exports = (sequelize, DataTypes) => {
     fortunePrice: {
       type: DataTypes.FLOAT,
       defaultValue: 0
-    }
+    },
+    fortuneTellerDescription: {
+      type: DataTypes.STRING,
+      allowNull: true,
+    },
   });
 
   return User;

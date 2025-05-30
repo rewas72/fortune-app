@@ -56,3 +56,30 @@ exports.getFortunetellersByHighestPrice = async (req, res) => {
     res.status(500).json({ error: "Sıralama yapılırken hata oluştu." });
   }
 };
+
+
+exports.getFortuneTellerWithReviews = async (req, res) => {
+  const { id } = req.params;                 // falcı id
+  try {
+    const ft = await User.findByPk(id, {
+      attributes: { exclude: ["password"] },
+      include: [
+        {
+          model: Review,
+          as: "ReceivedReviews",             // index.js’teki alias!
+          include: [
+            { model: User, as: "ReviewAuthor", attributes: ["id", "name", "profileImage"] },
+          ],
+          order: [["createdAt", "DESC"]],
+        },
+      ],
+    });
+
+    if (!ft || ft.role !== "fortuneteller")
+      return res.status(404).json({ error: "Falcı bulunamadı." });
+
+    res.json(ft);
+  } catch (err) {
+    res.status(500).json({ error: "Sunucu hatası." });
+  }
+};

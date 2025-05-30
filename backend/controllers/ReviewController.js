@@ -13,9 +13,9 @@ exports.createReview = async (req, res) => {
       },
     });
 
-    if (!hasRequest) {
+   /* if (!hasRequest) {
       return res.status(403).json({ error: "Bu falcıya yorum yapamazsınız. Önce fal almalısınız." });
-    }
+    }*/
 
     const existingReview = await Review.findOne({
       where: { userId, fortunetellerId },
@@ -40,8 +40,9 @@ exports.createReview = async (req, res) => {
 };
 
 
+
 exports.getFortuneTellerReviews = async (req, res) => {
-  const { id } = req.params;
+  const { id } = req.params;            
 
   try {
     const reviews = await Review.findAll({
@@ -49,19 +50,19 @@ exports.getFortuneTellerReviews = async (req, res) => {
       include: [
         {
           model: User,
-          as: "ReviewAuthor",
-          attributes: ["id", "name"]
-        }
+          as: 'ReviewAuthor',           
+          attributes: ['id', 'name', 'profileImage'],
+        },
       ],
-      order: [["createdAt", "DESC"]],
+      order: [['createdAt', 'DESC']],
     });
-    res.json(reviews)
-  } catch (error) {
-    res.status(500).json({ error: "Yorumlar getirilirken bir hata oluştu." });
-    console.error("veriler getirilirken:", error); // BU SATIRI EKLE
 
+    res.json(reviews);
+  } catch (error) {
+    console.error('Yorumlar getirilirken hata:', error);
+    res.status(500).json({ error: 'Yorumlar getirilirken bir hata oluştu.' });
   }
-}
+};
 
 // GET /api/fortunetellers/:id/average-rating
 exports.getAverageRating = async (req, res) => {
