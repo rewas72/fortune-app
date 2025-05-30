@@ -100,3 +100,41 @@ exports.getUserFortuneRequests = async (req, res) => {
     res.status(500).json({ error: "Sunucu hatası" });
   }
 };
+exports.getFortuneRequestById = async (req, res) => {
+  try {
+    const id = req.params.id;
+
+    const request = await FortuneRequest.findOne({
+      where: { id },
+      include: [
+        {
+          model: FortuneRequestImage,
+          as: "images",
+          attributes: ['imagePath'],  // burada imagePath kullan
+        },
+        {
+          model: User,
+          as: "Sender",  // burası user mı? orijinalde Sender ilişkisi var
+          attributes: ['id', 'name'],
+        }
+      ]
+    });
+
+    if (!request) {
+      return res.status(404).json({ message: "Fal isteği bulunamadı." });
+    }
+
+    res.json({
+      id: request.id,
+      message: request.message,
+      status: request.status,
+      response: request.answer, // burada backend'de answer olarak kayıtlı
+      createdAt: request.createdAt,
+      user: request.Sender,  // doğru alias
+      images: request.images.map(img => img.imagePath)
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Bir hata oluştu." });
+  }
+};

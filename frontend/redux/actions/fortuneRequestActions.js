@@ -41,3 +41,20 @@ export const getUserFortuneRequests = createAsyncThunk(
     }
   }
 );
+
+
+
+export const getFortuneRequestDetail = createAsyncThunk(
+  "fortuneRequest/getDetail",
+  async (id, thunkAPI) => {
+    try {
+      console.log("Detay çekiliyor...", id);
+      const response = await axios.get(`http://192.168.1.15:5000/api/fortune-requests/${id}`);
+      console.log("Gelen veri:", response.data);
+      return response.data;
+    } catch (error) {
+      console.error("Detay hata:", error.response?.data || error.message);
+      return thunkAPI.rejectWithValue(error.response?.data || "Bir hata oluştu");
+    }
+  }
+);

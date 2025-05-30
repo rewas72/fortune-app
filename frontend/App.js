@@ -16,7 +16,7 @@ import MainTabs from './navigations/MainTabs';
 import ChangePassword from './screens/ChangePassword';
 import SendFortuneScreen from './screens/SendFortuneScreen';
 import FortuneTellerDetailScreen from './screens/FortuneTellerScreen';
-
+import FortuneScreen from './screens/FortuneScreen';
 const Stack = createNativeStackNavigator();
 
 function MainApp() {
@@ -39,6 +39,7 @@ function MainApp() {
         <Stack.Screen name="ChangePassword" component={ChangePassword} />
         <Stack.Screen name="sendFortune" component={SendFortuneScreen} />
         <Stack.Screen name="FortuneTellerDetail" component={FortuneTellerDetailScreen} />
+        <Stack.Screen name="FortuneScreen" component={FortuneScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

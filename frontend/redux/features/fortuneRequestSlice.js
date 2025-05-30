@@ -1,6 +1,6 @@
 // redux/slices/fortuneRequestSlice.js
 import { createSlice } from "@reduxjs/toolkit";
-import { sendFortuneRequest, getUserFortuneRequests } from "../actions/fortuneRequestActions";
+import { sendFortuneRequest, getUserFortuneRequests, getFortuneRequestDetail } from "../actions/fortuneRequestActions";
 
 const fortuneRequestSlice = createSlice({
     name: "fortuneRequest",
@@ -9,6 +9,7 @@ const fortuneRequestSlice = createSlice({
         error: null,
         success: false,
         userRequests: [],
+        selectedRequest: null
     },
     reducers: {
         resetFortuneState: (state) => {
@@ -43,6 +44,18 @@ const fortuneRequestSlice = createSlice({
                 state.userRequests = action.payload;
             })
             .addCase(getUserFortuneRequests.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(getFortuneRequestDetail.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(getFortuneRequestDetail.fulfilled, (state, action) => {
+                state.loading = false;
+                state.selectedRequest = action.payload;
+            })
+            .addCase(getFortuneRequestDetail.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

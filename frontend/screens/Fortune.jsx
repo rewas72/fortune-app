@@ -1,8 +1,8 @@
 import React, { useEffect } from 'react';
-import { View, Text, FlatList, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, FlatList, ActivityIndicator, StyleSheet, TouchableOpacity } from 'react-native';
 import { useDispatch, useSelector } from 'react-redux';
 import { getUserFortuneRequests } from '../redux/actions/fortuneRequestActions';
-
+import { useNavigation } from '@react-navigation/native';
 const colors = {
     siyah: "#121212",
     beyaz: "#FFFFFF",
@@ -14,23 +14,24 @@ const colors = {
 
 const Fortune = () => {
     const dispatch = useDispatch();
+    const navigation = useNavigation();
     const profile = useSelector((state) => state.auth.profile);
     const user = useSelector((state) => state.auth);
     const { loading, userRequests } = useSelector(state => state.fortuneRequest);
 
     useEffect(() => {
-    if (profile?.id) {
-        dispatch(getUserFortuneRequests(profile.id));
-    }
-}, [profile]);
+        if (profile?.id) {
+            dispatch(getUserFortuneRequests(profile.id));
+        }
+    }, [profile]);
 
     const renderItem = ({ item }) => (
-        <View style={styles.card}>
+        <TouchableOpacity onPress={() => navigation.navigate("FortuneScreen", { id: item.id })} style={styles.card}>
             <Text style={styles.label}>Mesaj:</Text>
             <Text style={styles.value}>{item.message}</Text>
             <Text style={styles.label}>Durum:</Text>
             <Text style={styles.status}>{item.status === 'pending' ? 'Beklemede' : 'Yanıtlandı'}</Text>
-        </View>
+        </TouchableOpacity>
     );
 
     if (loading) {
@@ -40,13 +41,13 @@ const Fortune = () => {
     return (
         <View style={{ flex: 1, backgroundColor: colors.siyah }}>
             <View style={{ backgroundColor: colors.mor, padding: 20, paddingTop: 50 }}>
-                            <Text style={{ color: colors.sari, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>Fallarım</Text>
-                        </View>
+                <Text style={{ color: colors.sari, fontSize: 18, fontWeight: 'bold', textAlign: 'center' }}>Fallarım</Text>
+            </View>
             <FlatList
                 data={userRequests}
                 keyExtractor={(item) => item.id.toString()}
                 renderItem={renderItem}
-                contentContainerStyle={{ paddingBottom: 40, marginTop:20 }}
+                contentContainerStyle={{ paddingBottom: 40, marginTop: 20 }}
             />
         </View>
     );
