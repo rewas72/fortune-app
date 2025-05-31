@@ -3,13 +3,14 @@ import authReducer from "./features/authSlice";
 import fortunetellerReducer from "./features/fortunetellerSlice"
 import fortuneRequestReducer from "./features/fortuneRequestSlice";
 import reviewReducer from "./features/reviewSlice";
-
+import fortuneReducer from "./features/fortuneSlice"
 const store = configureStore({
   reducer: {
     auth: authReducer,
     fortuneteller: fortunetellerReducer,
     fortuneRequest: fortuneRequestReducer,
-    review : reviewReducer
+    review : reviewReducer,
+    fortune: fortuneReducer
   },
 });
 

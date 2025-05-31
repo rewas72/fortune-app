@@ -1,7 +1,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import FalciHomeScreen from '../screens/FalciHomeScreen';
 import { Ionicons } from '@expo/vector-icons';
+import FalciHomeScreen from '../fortuneTellerScreen/FalciHomeScreen';
 
 const Tab = createBottomTabNavigator();
 

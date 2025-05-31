@@ -1,11 +1,17 @@
-// redux/slices/authSlice.js
 import { createSlice } from '@reduxjs/toolkit';
-import { login, loadTokenAndAutoLogin, fetchUserProfile, updateUserProfileImage, updateUser, changePassword } from '../actions/authActions';
-
+import {
+  login,
+  loadTokenAndAutoLogin,
+  fetchUserProfile,
+  updateUserProfileImage,
+  updateUser,
+  changePassword,
+} from '../actions/authActions';
 
 const initialState = {
   token: null,
   role: null,
+  user: null,        // ✅ EKLENDİ
   loading: false,
   error: null,
 };
@@ -17,12 +23,9 @@ const authSlice = createSlice({
     logout: (state) => {
       state.token = null;
       state.role = null;
+      state.user = null;
       state.loading = false;
       state.error = null;
-    },
-    setUserInfo: (state, action) => {
-      state.user = action.payload
-
     },
     clearStatus: (state) => {
       state.loading = false;
@@ -40,46 +43,23 @@ const authSlice = createSlice({
         state.loading = false;
         state.token = action.payload.token;
         state.role = action.payload.role;
+        state.user = action.payload.user; // ✅ EKLENDİ
       })
       .addCase(login.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload;
-      })
-      .addCase(loadTokenAndAutoLogin.pending, (state) => {
-        state.loading = true;
-        state.error = null;
       })
       .addCase(loadTokenAndAutoLogin.fulfilled, (state, action) => {
         state.loading = false;
         state.token = action.payload.token;
         state.user = action.payload.user;
       })
-      .addCase(loadTokenAndAutoLogin.rejected, (state, action) => {
-        state.loading = false;
-        state.token = null;
-        state.user = null;
-        state.error = action.payload || action.error.message;
-      })
-      .addCase(fetchUserProfile.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-      })
       .addCase(fetchUserProfile.fulfilled, (state, action) => {
-        console.log("Profil yükleme hatası:", action.payload);
         state.loading = false;
         state.profile = action.payload;
-      })
-      .addCase(fetchUserProfile.rejected, (state, action) => {
-        state.loading = false;
-        state.error = action.payload;
       })
       .addCase(updateUserProfileImage.fulfilled, (state, action) => {
         state.profile = action.payload;
-      })
-      .addCase(updateUser.pending, (state) => {
-        state.loading = true;
-        state.error = null;
-        state.success = false;
       })
       .addCase(updateUser.fulfilled, (state, action) => {
         state.loading = false;
@@ -88,16 +68,10 @@ const authSlice = createSlice({
       })
       .addCase(updateUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload || "Bir hata oluştu.";
+        state.error = action.payload || 'Bir hata oluştu.';
         state.success = false;
       })
-      .addCase(changePassword.pending, (state) => {
-        console.log("Şifre güncelleme başlatıldı");
-        state.loading = true;
-        state.error = null;
-        state.success = false;
-      })
-      .addCase(changePassword.fulfilled, (state, action) => {
+      .addCase(changePassword.fulfilled, (state) => {
         state.loading = false;
         state.success = true;
       })
@@ -106,8 +80,6 @@ const authSlice = createSlice({
         state.error = action.payload || 'Şifre değiştirilemedi';
         state.success = false;
       });
-
-
   },
 });
 

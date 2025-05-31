@@ -8,7 +8,6 @@ import HomeScreen from './screens/HomeScreen';
 import StartScreen from './screens/StartScreen';
 import LoginScreen from './screens/LoginScreen';
 import SignupScreen from './screens/SignupScreen';
-import FalciHomeScreen from './screens/FalciHomeScreen';
 import AuthLoadingScreen from './AuthLoadingScreen';
 import { loadTokenAndAutoLogin } from './redux/actions/authActions';
 import FalciTabs from './navigations/FalciTabs';

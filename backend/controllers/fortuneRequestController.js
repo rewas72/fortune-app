@@ -100,6 +100,8 @@ exports.getUserFortuneRequests = async (req, res) => {
     res.status(500).json({ error: "Sunucu hatası" });
   }
 };
+
+
 exports.getFortuneRequestById = async (req, res) => {
   try {
     const id = req.params.id;
@@ -138,3 +140,23 @@ exports.getFortuneRequestById = async (req, res) => {
     res.status(500).json({ message: "Bir hata oluştu." });
   }
 };
+
+exports.getFortuneTellerRequest = async (req, res) => {
+  const {fortunetellerId} = req.params;
+
+  try {
+    const request = await FortuneRequest.findAll({
+      where: {fortunetellerId},
+      include: [
+        {model: FortuneRequestImage, as: "images"},
+        {model: User, as:"Sender", attributes:['id','name', 'email' ] }
+      ],
+      order: [["createdAt", "DESC"]],      
+    });
+
+    res.status(200).json(request)
+  } catch(error) {
+    console.log("hata:", error)
+  }
+};
+
